@@ -1,0 +1,76 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Data Directories (contain potentially sensitive crawled content)
+crawled-content/
+qdrant-data/
+webui-data/
+logs/
+
+# Temporary Files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build Output
+dist/
+build/
+out/
+
+# TypeScript
+*.tsbuildinfo
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup Files
+*.bak
+*.backup
+*.old
+
+# Quality Monitoring Data (contains usage patterns - keep private)
+quality-export-*.csv
+
+# Docker Volumes (will be recreated)
+docker-data/
+
+# Personal Configuration
+config.local.json
+settings.local.json
+
+# Authentication Tokens (security)
+*.pem
+*.key
+*.crt
+tokens.json
+auth.json

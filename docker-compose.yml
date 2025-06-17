@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: local-kb-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant-data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:6333"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: local-kb-webui
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./webui-data:/app/backend/data
+    environment:
+      # Ollama Configuration
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      
+      # RAG Configuration - Optimized for Quality
+      - RAG_EMBEDDING_MODEL=nomic-embed-text
+      - ENABLE_RAG_HYBRID_SEARCH=true
+      - RAG_TOP_K=8
+      - CHUNK_SIZE=1000
+      - CHUNK_OVERLAP=200
+      
+      # Performance Settings
+      - RAG_EMBEDDING_ENGINE=ollama
+      - RAG_RERANKING_MODEL=""
+      - RAG_RELEVANCE_THRESHOLD=0.0
+      
+      # UI Configuration
+      - WEBUI_NAME=Local Knowledge Base
+      - DEFAULT_MODELS=llama3.1:8b,deepseek-coder:6.7b
+      
+      # Security
+      - ENABLE_SIGNUP=true
+      - ENABLE_LOGIN_FORM=true
+      
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    depends_on:
+      - qdrant
+
+volumes:
+  qdrant-data:
+    driver: local
+  webui-data:
+    driver: local

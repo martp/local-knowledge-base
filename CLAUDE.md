@@ -1,0 +1,1 @@
+- could we commit after we've finished a feature or fix or enhancement

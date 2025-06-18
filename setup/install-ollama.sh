@@ -42,24 +42,60 @@ else
         fi
         
         # Start Ollama if not running
-        echo "🚀 Starting Ollama..."
-        if ! pgrep -x "ollama" > /dev/null; then
+        echo "🚀 Checking Ollama status..."
+        
+        # Check if Ollama server is responding
+        if ! curl -s http://localhost:11434/api/version > /dev/null 2>&1; then
+            echo "📱 Starting Ollama app..."
             open -a "Ollama"
-            echo "⏳ Waiting for Ollama to start..."
-            sleep 5
             
-            # Wait for Ollama to be ready
-            for i in {1..30}; do
+            echo "⏳ Waiting for Ollama server to start..."
+            for i in {1..60}; do
                 if curl -s http://localhost:11434/api/version > /dev/null 2>&1; then
-                    echo "✅ Ollama is running"
+                    echo ""
+                    echo "✅ Ollama server is ready!"
                     break
                 fi
                 echo -n "."
                 sleep 1
+                
+                # After 10 seconds, try launching again in case first attempt failed
+                if [ $i -eq 10 ]; then
+                    echo ""
+                    echo "🔄 Retrying Ollama launch..."
+                    open -a "Ollama" 2>/dev/null || true
+                fi
+                
+                # After 30 seconds, provide troubleshooting tips
+                if [ $i -eq 30 ]; then
+                    echo ""
+                    echo "⚠️  Ollama is taking longer than expected to start..."
+                    echo "   You may need to:"
+                    echo "   1. Check if Ollama app is in your Applications folder"
+                    echo "   2. Try starting Ollama manually from Applications"
+                    echo "   3. Check Activity Monitor for any Ollama processes"
+                fi
             done
-            echo ""
+            
+            # Final check
+            if ! curl -s http://localhost:11434/api/version > /dev/null 2>&1; then
+                echo ""
+                echo "❌ Ollama server is not responding after 60 seconds"
+                echo ""
+                echo "🔧 Troubleshooting steps:"
+                echo "1. Open Ollama manually from /Applications/Ollama.app"
+                echo "2. Check if macOS is blocking the app (System Settings > Privacy & Security)"
+                echo "3. Try running: killall ollama && open -a Ollama"
+                echo "4. Check Console.app for any Ollama-related errors"
+                echo ""
+                echo "Once Ollama is running, you can continue with:"
+                echo "  ollama pull llama3.1:8b"
+                echo "  ollama pull deepseek-coder:6.7b"
+                echo "  ollama pull nomic-embed-text"
+                exit 1
+            fi
         else
-            echo "✅ Ollama is already running"
+            echo "✅ Ollama server is already running"
         fi
         
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
